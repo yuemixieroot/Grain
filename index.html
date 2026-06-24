@@ -3,345 +3,494 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>💰 我的省钱累积器</title>
+    <title>🌱 寸进</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, "PingFang SC", sans-serif;
             background: #f7f3ee;
             min-height: 100vh;
+            padding: 16px 16px 100px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 16px;
         }
-        .card {
-            background: white;
-            border-radius: 32px;
-            padding: 32px 24px;
-            max-width: 440px;
+        .app {
+            max-width: 480px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+        }
+
+        /* 头部 */
+        .header {
             text-align: center;
+            padding: 20px 0 12px;
         }
-        .emoji-big { font-size: 40px; margin-bottom: 4px; }
-        h1 {
-            font-size: 20px;
-            font-weight: 600;
+        .header .icon { font-size: 36px; }
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
             color: #3d2c1e;
-            letter-spacing: 0.5px;
+            letter-spacing: 2px;
+            margin-top: 2px;
         }
-        .sub {
+        .header .sub {
             color: #a28d7a;
             font-size: 14px;
             margin-top: 2px;
-            margin-bottom: 24px;
-        }
-        .total-box {
-            background: #faf8f6;
-            border-radius: 24px;
-            padding: 24px 16px 20px;
-            margin-bottom: 24px;
-            border: 1px solid #ede8e2;
-        }
-        .total-label {
-            font-size: 13px;
-            color: #b5a392;
-            letter-spacing: 2px;
-        }
-        .total-number {
-            font-size: 56px;
-            font-weight: 700;
-            color: #2b5e3b;
-            line-height: 1.2;
-            margin-top: 2px;
-            font-variant-numeric: tabular-nums;
-            transition: all 0.15s ease;
-            word-break: break-all;
-        }
-        .total-number.pop {
-            transform: scale(1.05);
-            color: #1f7a3a;
         }
 
-        /* ===== 重点：输入区域适配 ===== */
-        .input-row {
+        /* 总行动力 */
+        .total-badge {
+            background: #2b5e3b;
+            border-radius: 20px;
+            padding: 14px 20px;
+            margin: 12px 0 20px;
             display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-            flex-wrap: nowrap;  /* 强制不换行 */
+            justify-content: space-between;
+            align-items: center;
+            color: white;
         }
-        .input-row input {
+        .total-badge .label {
+            font-size: 14px;
+            opacity: 0.85;
+        }
+        .total-badge .number {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* 每个目标卡片 */
+        .goal-card {
+            background: white;
+            border-radius: 20px;
+            padding: 18px 20px 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid #ede8e2;
+            transition: 0.15s;
+        }
+        .goal-card:active { transform: scale(0.99); }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .goal-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: #3d2c1e;
+        }
+        .goal-name .emoji { margin-right: 6px; }
+
+        .goal-value-wrap {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+        .goal-value {
+            font-size: 34px;
+            font-weight: 700;
+            color: #2b5e3b;
+            font-variant-numeric: tabular-nums;
+            transition: 0.12s;
+        }
+        .goal-value.pop {
+            transform: scale(1.08);
+            color: #1a6b30;
+        }
+        .goal-unit {
+            font-size: 15px;
+            color: #a28d7a;
+            font-weight: 500;
+        }
+
+        .goal-input-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .goal-input-row input {
             flex: 1;
-            min-width: 0;       /* 防止溢出 */
-            padding: 14px 16px;
+            padding: 10px 14px;
             border: 1px solid #e2d8d0;
-            border-radius: 16px;
-            font-size: 18px;
+            border-radius: 14px;
+            font-size: 16px;
             font-weight: 500;
             outline: none;
             background: #fcfaf8;
-            transition: 0.2s;
             color: #3d2c1e;
-            width: 100%;
-            -webkit-appearance: none;  /* 去掉iOS默认样式 */
+            min-width: 0;
+            -webkit-appearance: none;
         }
-        .input-row input:focus {
+        .goal-input-row input:focus {
             border-color: #8fb89b;
             background: white;
         }
-        .input-row input::placeholder {
+        .goal-input-row input::placeholder {
             color: #ccc2b8;
             font-weight: 400;
-            font-size: 15px;
+            font-size: 14px;
         }
-        .input-row .btn-add {
-            padding: 14px 22px;
+        .goal-input-row .btn-add {
+            padding: 10px 20px;
             background: #2b5e3b;
             color: white;
             border: none;
-            border-radius: 16px;
-            font-size: 17px;
+            border-radius: 14px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.15s;
             white-space: nowrap;
-            flex-shrink: 0;     /* 按钮不被压缩 */
-            min-width: 80px;
-            touch-action: manipulation;  /* 移动端点击优化 */
+            flex-shrink: 0;
+            touch-action: manipulation;
         }
-        .input-row .btn-add:active {
+        .goal-input-row .btn-add:active {
             transform: scale(0.94);
             background: #1f4a2e;
         }
-        /* 在特别小的屏幕上（<380px）按钮稍微缩小 */
-        @media (max-width: 380px) {
-            .input-row .btn-add {
-                padding: 14px 16px;
-                font-size: 15px;
-                min-width: 68px;
-            }
-            .input-row input {
-                font-size: 16px;
-                padding: 14px 12px;
-            }
-            .total-number { font-size: 44px; }
-            .card { padding: 24px 16px; }
-        }
 
-        .quick-actions {
+        .goal-actions {
             display: flex;
-            gap: 8px;
-            justify-content: center;
+            gap: 6px;
+            margin-top: 10px;
             flex-wrap: wrap;
         }
-        .quick-btn {
-            padding: 8px 18px;
+        .goal-actions .quick-btn {
+            padding: 5px 14px;
             background: #f0ebe6;
             border: none;
-            border-radius: 30px;
-            font-size: 14px;
+            border-radius: 20px;
+            font-size: 13px;
             color: #5a4a3a;
             cursor: pointer;
-            transition: 0.1s;
-            font-weight: 500;
             touch-action: manipulation;
-            flex: 0 1 auto;
+            font-weight: 500;
         }
-        .quick-btn:active { background: #dcd3ca; transform: scale(0.95); }
+        .goal-actions .quick-btn:active { background: #dcd3ca; transform: scale(0.95); }
 
-        .reset-area {
-            margin-top: 24px;
-            border-top: 1px solid #eee8e2;
-            padding-top: 16px;
+        .goal-footer {
             display: flex;
-            justify-content: center;
-            gap: 16px;
+            justify-content: flex-end;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f3ede8;
         }
-        .reset-btn {
+        .goal-footer .del-btn {
             background: none;
             border: none;
-            color: #bfb0a2;
-            font-size: 13px;
-            cursor: pointer;
-            text-decoration: underline dotted;
-            padding: 4px 8px;
-        }
-        .reset-btn:active { color: #a08472; }
-
-        .history {
-            margin-top: 20px;
-            text-align: left;
-            border-top: 1px solid #f0eae4;
-            padding-top: 14px;
-            max-height: 130px;
-            overflow-y: auto;
-        }
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: #7a6a5a;
-            padding: 4px 0;
-            border-bottom: 1px dashed #f3ede8;
-        }
-        .history-item .h-val { font-weight: 600; color: #2b5e3b; }
-        .history-empty { color: #ccc2b8; font-size: 13px; text-align: center; padding: 8px 0; }
-        .footer-note {
-            margin-top: 14px;
+            color: #d5c8bc;
             font-size: 12px;
+            cursor: pointer;
+            padding: 2px 8px;
+        }
+        .goal-footer .del-btn:active { color: #b5a392; }
+
+        /* 添加目标按钮 */
+        .add-goal-btn {
+            width: 100%;
+            padding: 16px;
+            background: white;
+            border: 2px dashed #e2d8d0;
+            border-radius: 20px;
+            font-size: 16px;
+            color: #a28d7a;
+            cursor: pointer;
+            touch-action: manipulation;
+            margin-top: 4px;
+            transition: 0.1s;
+        }
+        .add-goal-btn:active {
+            background: #f5f0eb;
+            border-color: #ccc2b8;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
             color: #ccc2b8;
+        }
+        .empty-state .big { font-size: 48px; display: block; margin-bottom: 12px; }
+        .empty-state p { font-size: 15px; }
+
+        /* 底部提示 */
+        .footer-note {
+            text-align: center;
+            color: #d5c8bc;
+            font-size: 12px;
+            margin-top: 24px;
+            padding-bottom: 20px;
         }
     </style>
 </head>
 <body>
-<div class="card">
-    <div class="emoji-big">🌱</div>
-    <h1>我的省钱累积器</h1>
-    <div class="sub">每省一笔，离自由更近一步</div>
 
-    <div class="total-box">
-        <div class="total-label">已累计节省</div>
-        <div class="total-number" id="totalDisplay">0.00</div>
+<div class="app" id="app">
+    <!-- 头部 -->
+    <div class="header">
+        <div class="icon">🌱</div>
+        <h1>寸进</h1>
+        <div class="sub">每一步都算数</div>
     </div>
 
-    <!-- 输入区域：输入框 + 添加按钮 始终在同一行 -->
-    <div class="input-row">
-        <input type="number" id="amountInput" step="0.01" min="0.01" placeholder="输入金额" autofocus>
-        <button class="btn-add" id="addBtn">+ 添加</button>
+    <!-- 总行动力 -->
+    <div class="total-badge">
+        <span class="label">📊 总行动力</span>
+        <span class="number" id="grandTotal">0</span>
     </div>
 
-    <div class="quick-actions">
-        <button class="quick-btn" data-amount="5">+5</button>
-        <button class="quick-btn" data-amount="10">+10</button>
-        <button class="quick-btn" data-amount="20">+20</button>
-        <button class="quick-btn" data-amount="50">+50</button>
-    </div>
+    <!-- 目标列表 -->
+    <div id="goalList"></div>
 
-    <div class="history" id="historyList">
-        <div class="history-empty">还没有记录，添加第一笔吧 ✨</div>
-    </div>
+    <!-- 添加目标 -->
+    <button class="add-goal-btn" id="addGoalBtn">✨ 添加新目标</button>
 
-    <div class="reset-area">
-        <button class="reset-btn" id="resetConfirmBtn">重置所有记录</button>
-    </div>
     <div class="footer-note">数据只保存在你的浏览器中</div>
 </div>
 
 <script>
-    // ---------- 核心逻辑 ----------
-    const STORAGE_KEY = 'saving_tracker_data';
+    // ============================================================
+    //  数据层
+    // ============================================================
+    const STORAGE_KEY = 'inch_goals_data';
 
     function loadData() {
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
                 const data = JSON.parse(raw);
-                if (typeof data.total === 'number' && Array.isArray(data.records)) {
-                    return data;
-                }
+                if (Array.isArray(data)) return data;
             }
         } catch (e) {}
-        return { total: 0, records: [] };
+        return [];
     }
 
-    function saveData(data) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    function saveData(goals) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(goals));
     }
 
-    let data = loadData();
+    let goals = loadData();
+    let nextId = goals.length > 0 ? Math.max(...goals.map(g => g.id)) + 1 : 1;
 
-    const totalDisplay = document.getElementById('totalDisplay');
-    const amountInput = document.getElementById('amountInput');
-    const addBtn = document.getElementById('addBtn');
-    const historyList = document.getElementById('historyList');
+    // ============================================================
+    //  渲染层
+    // ============================================================
+    const goalListEl = document.getElementById('goalList');
+    const grandTotalEl = document.getElementById('grandTotal');
 
-    function renderTotal(animate = false) {
-        totalDisplay.textContent = data.total.toFixed(2);
+    // 生成一个随机 emoji 作为默认图标
+    const emojis = ['🏠', '💡', '📚', '🏃', '🎯', '🌟', '🌊', '🌲', '🍀', '🔥', '💎', '🌈', '🦋', '🌺', '⭐'];
+    function randomEmoji() { return emojis[Math.floor(Math.random() * emojis.length)]; }
+
+    // 计算总行动力
+    function calcGrandTotal() {
+        return goals.reduce((sum, g) => sum + (g.total || 0), 0);
+    }
+
+    // 更新总行动力显示
+    function updateGrandTotal(animate = false) {
+        const val = calcGrandTotal();
+        grandTotalEl.textContent = val;
         if (animate) {
-            totalDisplay.classList.add('pop');
-            setTimeout(() => totalDisplay.classList.remove('pop'), 200);
+            grandTotalEl.style.transition = 'transform 0.12s';
+            grandTotalEl.style.transform = 'scale(1.12)';
+            setTimeout(() => { grandTotalEl.style.transform = 'scale(1)'; }, 150);
         }
     }
 
-    function renderHistory() {
-        if (data.records.length === 0) {
-            historyList.innerHTML = '<div class="history-empty">还没有记录，添加第一笔吧 ✨</div>';
+    // 渲染所有目标
+    function render() {
+        if (goals.length === 0) {
+            goalListEl.innerHTML = `
+                <div class="empty-state">
+                    <span class="big">🌱</span>
+                    <p>还没有目标，<br>点击下方「添加新目标」开始吧</p>
+                </div>
+            `;
+            updateGrandTotal(false);
             return;
         }
-        const recent = data.records.slice(-10).reverse();
+
         let html = '';
-        recent.forEach((val, index) => {
-            const prefix = index === 0 ? '🟢 ' : '';
-            html += `<div class="history-item">
-                <span>${prefix}${index === 0 ? '刚刚 · ' : ''}+${Number(val).toFixed(2)}</span>
-                <span class="h-val">¥${Number(val).toFixed(2)}</span>
-            </div>`;
+        goals.forEach((goal, index) => {
+            const val = goal.total || 0;
+            const unit = goal.unit || '';
+            const emoji = goal.emoji || '📌';
+            const name = goal.name || '未命名';
+
+            html += `
+                <div class="goal-card" data-id="${goal.id}">
+                    <div class="goal-header">
+                        <span class="goal-name"><span class="emoji">${emoji}</span>${name}</span>
+                        <div class="goal-value-wrap">
+                            <span class="goal-value" id="val_${goal.id}">${val}</span>
+                            <span class="goal-unit">${unit}</span>
+                        </div>
+                    </div>
+
+                    <div class="goal-input-row">
+                        <input type="number" step="any" min="0.01" placeholder="输入数值" id="input_${goal.id}">
+                        <button class="btn-add" data-id="${goal.id}">+ 添加</button>
+                    </div>
+
+                    <div class="goal-actions">
+                        <button class="quick-btn" data-id="${goal.id}" data-amount="1">+1</button>
+                        <button class="quick-btn" data-id="${goal.id}" data-amount="5">+5</button>
+                        <button class="quick-btn" data-id="${goal.id}" data-amount="10">+10</button>
+                        <button class="quick-btn" data-id="${goal.id}" data-amount="50">+50</button>
+                        <button class="quick-btn" data-id="${goal.id}" data-amount="100">+100</button>
+                    </div>
+
+                    <div class="goal-footer">
+                        <button class="del-btn" data-id="${goal.id}">删除此目标</button>
+                    </div>
+                </div>
+            `;
         });
-        if (data.records.length > 10) {
-            html += `<div style="text-align:center;color:#ccc2b8;font-size:12px;padding-top:6px;">…… 共 ${data.records.length} 笔</div>`;
-        }
-        historyList.innerHTML = html;
-    }
 
-    function addAmount(val) {
-        const num = parseFloat(val);
-        if (isNaN(num) || num <= 0) {
-            amountInput.style.borderColor = '#d95b5b';
-            setTimeout(() => amountInput.style.borderColor = '#e2d8d0', 600);
-            return false;
-        }
-        data.total += num;
-        data.records.push(num);
-        saveData(data);
-        renderTotal(true);
-        renderHistory();
-        amountInput.value = '';
-        amountInput.focus();
-        return true;
-    }
+        goalListEl.innerHTML = html;
+        updateGrandTotal(false);
 
-    function resetData() {
-        if (data.records.length === 0) return;
-        if (confirm('确定要清除所有记录吗？此操作不可撤销。')) {
-            data = { total: 0, records: [] };
-            saveData(data);
-            renderTotal(false);
-            renderHistory();
-            amountInput.focus();
-        }
-    }
-
-    addBtn.addEventListener('click', () => {
-        const val = amountInput.value.trim();
-        if (val === '') return;
-        addAmount(val);
-    });
-
-    amountInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addBtn.click();
-        }
-    });
-
-    document.querySelectorAll('.quick-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const amt = parseFloat(btn.dataset.amount);
-            addAmount(amt);
+        // ---------- 绑定事件 ----------
+        // 添加按钮
+        document.querySelectorAll('.goal-input-row .btn-add').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const id = parseInt(this.dataset.id);
+                const input = document.getElementById('input_' + id);
+                const val = parseFloat(input.value.trim());
+                if (isNaN(val) || val <= 0) {
+                    input.style.borderColor = '#d95b5b';
+                    setTimeout(() => input.style.borderColor = '#e2d8d0', 600);
+                    return;
+                }
+                addToGoal(id, val);
+                input.value = '';
+                input.focus();
+            });
         });
+
+        // 输入框回车
+        document.querySelectorAll('.goal-input-row input').forEach(inp => {
+            inp.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const id = parseInt(this.id.replace('input_', ''));
+                    const btn = document.querySelector(`.btn-add[data-id="${id}"]`);
+                    if (btn) btn.click();
+                }
+            });
+        });
+
+        // 快捷按钮
+        document.querySelectorAll('.quick-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const id = parseInt(this.dataset.id);
+                const amt = parseFloat(this.dataset.amount);
+                addToGoal(id, amt);
+            });
+        });
+
+        // 删除按钮
+        document.querySelectorAll('.del-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const id = parseInt(this.dataset.id);
+                if (confirm('确定要删除这个目标吗？它的所有记录都会消失。')) {
+                    deleteGoal(id);
+                }
+            });
+        });
+
+        // 点击卡片空白处聚焦输入框
+        document.querySelectorAll('.goal-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (e.target.closest('button') || e.target.closest('input')) return;
+                const id = parseInt(this.dataset.id);
+                const inp = document.getElementById('input_' + id);
+                if (inp) inp.focus();
+            });
+        });
+    }
+
+    // ============================================================
+    //  操作层
+    // ============================================================
+    function addToGoal(id, amount) {
+        const goal = goals.find(g => g.id === id);
+        if (!goal) return;
+        goal.total = (goal.total || 0) + amount;
+
+        // 记录历史（用于扩展，暂时不展示）
+        if (!goal.records) goal.records = [];
+        goal.records.push(amount);
+
+        saveData(goals);
+
+        // 更新该目标的显示
+        const valEl = document.getElementById('val_' + id);
+        if (valEl) {
+            valEl.textContent = goal.total;
+            valEl.classList.add('pop');
+            setTimeout(() => valEl.classList.remove('pop'), 200);
+        }
+
+        // 更新总行动力
+        updateGrandTotal(true);
+    }
+
+    function deleteGoal(id) {
+        goals = goals.filter(g => g.id !== id);
+        saveData(goals);
+        render();
+    }
+
+    function addGoal() {
+        const name = prompt('这个目标叫什么名字？\n（例如：买房基金、健身打卡）');
+        if (name === null || name.trim() === '') return;
+
+        const unit = prompt('单位是什么？\n（例如：元、次、个、天，不填也可以）') || '';
+
+        const newGoal = {
+            id: nextId++,
+            name: name.trim(),
+            unit: unit,
+            emoji: randomEmoji(),
+            total: 0,
+            records: []
+        };
+
+        goals.push(newGoal);
+        saveData(goals);
+        render();
+
+        // 滚动到新卡片并聚焦
+        setTimeout(() => {
+            const card = document.querySelector(`.goal-card[data-id="${newGoal.id}"]`);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const inp = document.getElementById('input_' + newGoal.id);
+                if (inp) setTimeout(() => inp.focus(), 300);
+            }
+        }, 100);
+    }
+
+    // ============================================================
+    //  启动
+    // ============================================================
+    document.getElementById('addGoalBtn').addEventListener('click', addGoal);
+
+    // 点击页面空白聚焦到第一个输入框（辅助）
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.app')) return;
+        const firstInput = document.querySelector('.goal-input-row input');
+        if (firstInput) firstInput.focus();
     });
 
-    document.getElementById('resetConfirmBtn').addEventListener('click', resetData);
-
-    renderTotal(false);
-    renderHistory();
-    amountInput.focus();
-
-    document.querySelector('.card').addEventListener('click', (e) => {
-        if (e.target.closest('button') || e.target.closest('input')) return;
-        amountInput.focus();
-    });
+    render();
 </script>
 </body>
 </html>
